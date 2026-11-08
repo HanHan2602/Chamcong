@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;600;700&display=swap"><title>Chấm công - Thảo Điền Florist</title>
+<style>
+:root{--bg:#04241f;--bg2:#0a3029;--card:#0d3a32;--line:#1d5247;--gold:#e8b48a;--gold2:#f6dcc6;--tx:#f3ebe3;--mu:#9bb5ac;--bad:#e88a8a;--ok:#8ae8b0}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.6 'Be Vietnam Pro','Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+header{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg);border-bottom:1px solid var(--line)}
+header img{height:64px;width:64px;object-fit:cover;border-radius:8px}
+header h1{margin:0;font-size:22px;font-weight:600;line-height:1.6;padding:2px 0;letter-spacing:.02em;background:linear-gradient(90deg,var(--gold2),var(--gold));-webkit-background-clip:text;color:transparent}
+header p{margin:0;color:var(--mu);font-size:13px}
+.nav{display:flex;gap:8px;padding:12px 16px 0;max-width:1100px;margin:auto}
+.nav button,.sub button,.seg button{flex:1;padding:10px;border:1px solid var(--line);background:transparent;border-radius:10px;cursor:pointer;color:var(--mu)}
+.nav button.on,.sub button.on,.seg button.on{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#2a1a0e;border-color:transparent;font-weight:700}
+main{max-width:1100px;margin:auto;padding:12px 16px 40px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.clock{text-align:center;font-size:40px;font-weight:300;line-height:1.3;color:var(--gold);letter-spacing:.05em;margin:6px 0 0}
+.date{text-align:center;color:var(--mu);margin-bottom:12px}
+label{display:block;margin:12px 0 4px;color:var(--gold2);font-size:14px}
+input,select,textarea{width:100%;padding:11px;background:var(--bg);border:1px solid var(--line);border-radius:10px}
+.seg,.sub{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}.sub button{flex:none;padding:8px 14px}
+.btn{width:100%;margin-top:16px;padding:13px;border:0;border-radius:10px;background:linear-gradient(135deg,var(--gold2),var(--gold));color:#2a1a0e;font-weight:700;font-size:16px;cursor:pointer}
+.sm{padding:5px 9px;border:1px solid var(--gold);background:transparent;color:var(--gold);border-radius:8px;cursor:pointer;font-size:13px;margin:1px}
+.sm.d{border-color:var(--bad);color:var(--bad)}
+.pv{width:100px;height:100px;object-fit:cover;border-radius:10px;margin-top:8px;display:none}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:900px;font-size:13px}
+th,td{padding:7px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}th{color:var(--gold);font-weight:400}
+td img{width:38px;height:38px;object-fit:cover;border-radius:6px;cursor:pointer}
+.tag{padding:2px 8px;border-radius:99px;font-weight:700}.X{background:#1d6a4d}.P{background:#8a5a1d}.PX{background:#6a4d1d}.N{background:#5a2a2a}
+.bad{color:var(--bad)}.ok{color:var(--ok)}.mu{color:var(--mu)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:end}.row>*{flex:1;min-width:120px}
+#m{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;padding:16px;z-index:9}#m.on{display:flex}
+.box{background:var(--card);border:1px solid var(--gold);border-radius:14px;padding:18px;max-width:420px;width:100%;max-height:90vh;overflow:auto}
+.box h3{margin:0 0 8px;color:var(--gold);font-weight:400}.bt{display:flex;gap:8px;margin-top:14px}.bt button{flex:1;padding:10px;border-radius:10px;border:1px solid var(--line);background:transparent;cursor:pointer}.bt button.p{background:var(--gold);color:#2a1a0e;border:0;font-weight:700}
+.box img.big{width:100%;border-radius:10px}
+.hide{display:none}
+</style></head><body>
+<header><img id="lg" alt="logo"><div><h1 id="ti"></h1><p id="su"></p></div></header>
+<div class="nav"><button class="on" data-p="p1">Chấm công</button><button data-p="p2">Quản lý</button></div>
+<main>
+<section id="p1">
+ <div class="card"><div class="clock" id="ck"></div><div class="date" id="dt"></div>
+  <div class="seg"><button class="on" data-c="ci">Check in</button><button data-c="co">Check out</button></div>
+  <div id="ci">
+   <label>Tên nhân viên</label><select id="ciN"></select>
+   <label>Loại chấm công</label><select id="ciT"><option value="normal">Đi làm bình thường</option><option value="full">Nghỉ phép cả ngày</option><option value="am">Nghỉ phép sáng</option><option value="pm">Nghỉ phép chiều</option></select>
+   <label>Ảnh check in</label><input type="file" id="ciF" accept="image/*" capture="user"><img class="pv" id="ciP">
+   <button class="btn" onclick="checkin()">Check in</button></div>
+  <div id="co" class="hide">
+   <label>Tên nhân viên</label><select id="coN"></select>
+   <label>Loại</label><select id="coT"><option value="home">Về</option><option value="half">Nghỉ buổi chiều</option></select>
+   <label>Ảnh check out</label><input type="file" id="coF" accept="image/*" capture="user"><img class="pv" id="coP">
+   <button class="btn" onclick="checkout()">Check out</button></div>
+ </div>
+</section>
+<section id="p2" class="hide">
+ <div id="lgn" class="card"><label>ID</label><input id="aid" autocomplete="username"><label>Mật khẩu</label><input id="apw" type="password" autocomplete="current-password"><button class="btn" onclick="login()">Đăng nhập</button></div>
+ <div id="adm" class="hide">
+  <div class="sub"><button class="on" data-a="a1">Chấm công</button><button data-a="a2">Nhân viên</button><button data-a="a3">Đăng nhập &amp; giao diện</button><button onclick="logout()">Thoát</button></div>
+  <div id="a1"></div><div id="a2" class="hide"></div><div id="a3" class="hide"></div>
+ </div>
+</section>
+</main>
+<div id="m"></div>
+<script>
+const DEF_LOGO="data:image/jpeg;base64,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",K='tdf_cc_v1',$=i=>document.getElementById(i);
+let db=JSON.parse(localStorage.getItem(K)||'null')||{s:{title:'Thảo Điền Florist',sub:'Hệ thống chấm công',logo:DEF_LOGO,mLate:'Hôm nay bạn đi trễ. Vui lòng nhập lý do:',mThanks:'Hôm nay bạn vất vả rồi, cảm ơn bạn! 🌿',mOk:'Đã ghi nhận thành công!',id:'han',pw:'2026'},staff:[],rec:[]};
+if(db.s.id=='admin'&&db.s.pw=='admin123'){db.s.id='han';db.s.pw='2026'}
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(db))}catch(e){alert('Bộ nhớ đầy, hãy xuất Excel và xóa bớt dữ liệu cũ.')}};
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const p2=n=>String(n).padStart(2,'0'),fd=d=>`${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`;
+const today=()=>fd(new Date()),nowT=()=>{const d=new Date();return p2(d.getHours())+':'+p2(d.getMinutes())};
+const mi=t=>{const[a,b]=t.split(':');return +a*60+ +b},hm=m=>m?Math.floor(m/60)+'h'+p2(m%60):'';
+const dmy=s=>s.split('-').reverse().join('/');
+const sf=id=>db.staff.find(x=>x.id==id);
+const active=d=>db.staff.filter(s=>!s.left||d<=s.left);
+const TY={normal:'Đi làm',full:'Nghỉ phép cả ngày',am:'Nghỉ phép sáng',pm:'Nghỉ phép chiều'};
+function dlg(t,body,btns){return new Promise(res=>{const m=$('m');m.innerHTML=`<div class="box"><h3>${t}</h3><div>${body}</div><div class="bt"></div></div>`;btns.forEach(([l,v,c])=>{const b=document.createElement('button');b.textContent=l;b.className=c||'';b.onclick=()=>{const f={};m.querySelectorAll('[name]').forEach(e=>f[e.name]=e.value);m.classList.remove('on');res({v,f})};m.querySelector('.bt').append(b)});m.classList.add('on')})}
+const info=(t,b)=>dlg(t,b,[['Đóng',1,'p']]);
+function img(file,w,cb){const r=new FileReader();r.onload=e=>{const i=new Image();i.onload=()=>{const k=Math.min(1,w/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',.5))};i.src=e.target.result};r.readAsDataURL(file)}
+function skin(){$('lg').src=db.s.logo;$('ti').textContent=db.s.title;$('su').textContent=db.s.sub;document.title=db.s.title+' - Chấm công'}
+setInterval(()=>{const d=new Date();$('ck').textContent=nowT()+':'+p2(d.getSeconds());$('dt').textContent=dmy(today())},1000);
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('on',x==b));$('p1').classList.toggle('hide',b.dataset.p!='p1');$('p2').classList.toggle('hide',b.dataset.p!='p2')});
+document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.seg button').forEach(x=>x.classList.toggle('on',x==b));$('ci').classList.toggle('hide',b.dataset.c!='ci');$('co').classList.toggle('hide',b.dataset.c!='co');fillSel()});
+document.querySelectorAll('.sub button[data-a]').forEach(b=>b.onclick=()=>{document.querySelectorAll('.sub button[data-a]').forEach(x=>x.classList.toggle('on',x==b));['a1','a2','a3'].forEach(i=>$(i).classList.toggle('hide',i!=b.dataset.a));renderAll()});
+let photo='';$('ciF').onchange=e=>{const f=e.target.files[0];if(!f)return;img(f,160,d=>{photo=d;$('ciP').src=d;$('ciP').style.display='block'})};
+let photo2='';$('coF').onchange=e=>{const f=e.target.files[0];if(!f)return;img(f,160,d=>{photo2=d;$('coP').src=d;$('coP').style.display='block'})};
+function fillSel(){const t=today(),a=active(t),has=id=>db.rec.find(r=>r.d==t&&r.sid==id);
+$('ciN').innerHTML='<option value="">-- Chọn tên --</option>'+a.filter(s=>!has(s.id)).map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');
+$('coN').innerHTML='<option value="">-- Chọn tên --</option>'+a.filter(s=>{const r=has(s.id);return r&&!r.out&&r.type!='full'}).map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('')}
+async function checkin(){const id=$('ciN').value,type=$('ciT').value;if(!id)return info('Thiếu thông tin','Vui lòng chọn tên.');if(!photo)return info('Thiếu ảnh','Vui lòng chọn ảnh check in.');
+const s=sf(id),t=nowT();let reason='';
+if(type=='normal'){if(t>s.start){const r=await dlg('⏰ '+esc(db.s.mLate.split(':')[0]),`<p>${esc(db.s.mLate)}</p><p class="mu">Giờ bắt đầu ${s.start} – Bạn check in lúc ${t}</p><textarea name="r" rows="3" placeholder="Lý do đi trễ"></textarea>`,[['Hủy',0],['Xác nhận',1,'p']]);if(!r.v)return;if(!r.f.r.trim())return info('Thiếu lý do','Vui lòng nhập lý do đi trễ.');reason=r.f.r.trim()}}
+else{const r=await dlg('Lý do nghỉ phép',`<textarea name="r" rows="3" placeholder="Nhập lý do nghỉ"></textarea>`,[['Hủy',0],['Xác nhận',1,'p']]);if(!r.v)return;if(!r.f.r.trim())return info('Thiếu lý do','Vui lòng nhập lý do nghỉ.');reason=r.f.r.trim()}
+db.rec.push({id:Date.now(),d:today(),sid:id,type,in:t,out:'',ot:'',reason,photo,ap:false});save();photo='';$('ciP').style.display='none';$('ciF').value='';$('ciT').value='normal';fillSel();info('✔ '+esc(s.name),esc(db.s.mOk))}
+async function checkout(){const id=$('coN').value;if(!id)return info('Thiếu thông tin','Vui lòng chọn tên (cần check in trước).');
+if(!photo2)return info('Thiếu ảnh','Vui lòng chọn ảnh check out.');const r=db.rec.find(x=>x.d==today()&&x.sid==id),s=sf(id),t=nowT();r.out=t;r.ot=$('coT').value;r.photo2=photo2;save();photo2='';$('coP').style.display='none';$('coF').value='';fillSel();
+info(t>s.end?'🌿 Cảm ơn bạn':'✔ '+esc(s.name),t>s.end?esc(db.s.mThanks):esc(db.s.mOk))}
+function calc(r){const s=sf(r.sid)||{start:'08:00',end:'17:00'};let late=0,early=0,ot=0;
+const mark=r.type=='full'?'P':(r.type=='normal'&&r.ot!='half'?'X':'PX');
+if(r.type=='normal'&&r.in>s.start)late=mi(r.in)-mi(s.start);
+if(r.type=='normal'&&r.out&&r.ot=='home'&&r.out<s.end)early=mi(s.end)-mi(r.out);
+if(mark=='X'){if(r.in&&mi(s.start)-mi(r.in)>=30)ot+=mi(s.start)-mi(r.in);if(r.out&&mi(r.out)-mi(s.end)>=30)ot+=mi(r.out)-mi(s.end)}
+return{mark,late,early,ot}}
+function range(){const m=$('rm')?.value||'day',d=new Date(($('rd')?.value||today())+'T00:00:00');let a=new Date(d),b=new Date(d);
+if(m=='week'){const w=(d.getDay()+6)%7;a.setDate(d.getDate()-w);b=new Date(a);b.setDate(a.getDate()+6)}
+if(m=='month'){a=new Date(d.getFullYear(),d.getMonth(),1);b=new Date(d.getFullYear(),d.getMonth()+1,0)}
+return[fd(a),fd(b),m]}
+function days(a,b){const o=[];for(let d=new Date(a+'T00:00:00');fd(d)<=b;d.setDate(d.getDate()+1))o.push(fd(d));return o}
+function stats(a,b){const ds=days(a,b).filter(d=>d<=today()),open=new Set(db.rec.filter(r=>r.d>=a&&r.d<=b).map(r=>r.d));
+return db.staff.filter(s=>!s.left||s.left>=a).map(s=>{const o={s,x:0,p:0,px:0,late:0,early:0,ot:0,otAp:0,miss:0,xd:[],pd:[]};
+db.rec.filter(r=>r.sid==s.id&&r.d>=a&&r.d<=b).forEach(r=>{const c=calc(r);if(c.mark=='X'){o.x++;o.xd.push(r.d.slice(8))}else if(c.mark=='P'){o.p++;o.pd.push(r.d.slice(8))}else{o.px++;o.xd.push(r.d.slice(8)+'½');o.pd.push(r.d.slice(8)+'½')}
+if(c.late)o.late++;if(c.early)o.early++;o.ot+=c.ot;if(r.ap)o.otAp+=c.ot});
+ds.forEach(d=>{if(open.has(d)&&(!s.left||d<=s.left)&&!db.rec.find(r=>r.d==d&&r.sid==s.id))o.miss++});return o})}
+function renderA1(){const[a,b,m]=range(),pr=$('rm')?{m:$('rm').value,d:$('rd').value}:{m:'day',d:today()};
+let rows=db.rec.filter(r=>r.d>=a&&r.d<=b).sort((x,y)=>y.d.localeCompare(x.d)||x.in.localeCompare(y.in)).map(r=>({r}));
+if(m=='day'&&a<=today())active(a).forEach(s=>{if(!db.rec.find(r=>r.d==a&&r.sid==s.id))rows.push({miss:s})});
+const tr=rows.map(({r,miss})=>{if(miss)return`<tr><td>${esc(miss.name)}</td><td colspan="9"><span class="tag N">Chưa check in</span></td></tr>`;
+const s=sf(r.sid)||{name:'(đã xóa)'},c=calc(r);
+return`<tr><td>${m!='day'?dmy(r.d)+' – ':''}${esc(s.name)}</td><td>${r.in||''}</td><td>${r.out||''}</td><td><span class="tag ${c.mark}">${c.mark}</span></td>
+<td>${c.ot?hm(c.ot)+(r.ap?' <span class="ok">✔</span>':` <button class="sm" onclick="appr(${r.id})">Duyệt</button>`):''}</td><td class="${c.late?'bad':''}">${c.late?c.late+'p':''}</td><td class="${c.early?'bad':''}">${c.early?c.early+'p':''}</td>
+<td>${r.photo?`<img src="${r.photo}" onclick="big(${r.id},1)">`:''}${r.photo2?` <img src="${r.photo2}" onclick="big(${r.id},2)">`:''}</td><td>${esc(r.reason)}</td><td><button class="sm" onclick="editR(${r.id})">Sửa</button><button class="sm d" onclick="delR(${r.id})">Xóa</button></td></tr>`}).join('')||'<tr><td colspan="10" class="mu">Chưa có dữ liệu</td></tr>';
+const st=stats(a,b),top=(f,fn)=>{const v=[...st].sort((x,y)=>fn(y)-fn(x))[0];return v&&fn(v)>0?`${esc(v.s.name)} (${f(v)})`:'—'};
+const best=[...st].sort((x,y)=>(y.x+y.px/2-y.late*.5-y.miss)-(x.x+x.px/2-x.late*.5-x.miss))[0];
+const left=db.staff.filter(s=>s.left&&s.left>=a&&s.left<=b).map(s=>esc(s.name)+' ('+dmy(s.left)+')').join(', ')||'—';
+$('a1').innerHTML=`<div class="card"><div class="row"><div><label>Xem theo</label><select id="rm" onchange="renderA1()"><option value="day">Ngày</option><option value="week">Tuần</option><option value="month">Tháng</option></select></div><div><label>Ngày</label><input type="date" id="rd" onchange="renderA1()"></div><button class="sm" style="flex:none;padding:11px" onclick="xls()">⬇ Xuất Excel</button></div>
+<p class="mu">${dmy(a)}${a!=b?' → '+dmy(b):''}</p></div>
+<div class="card tw"><table><tr><th>Tên</th><th>Vào</th><th>Ra</th><th>Công</th><th>Tăng ca</th><th>Đi trễ</th><th>Về sớm</th><th>Ảnh vào/ra</th><th>Ghi chú</th><th></th></tr>${tr}</table>
+<p class="mu">X: đi làm · P: phép · PX: nửa ngày · Tăng ca tính khi đến sớm/về muộn từ 30 phút, cộng dồn.</p></div>
+<div class="card"><h3 style="margin-top:0;color:var(--gold);font-weight:400">Đánh giá</h3>
+<p>🌟 Đầy đủ nhất: ${best&&(best.x+best.px)?esc(best.s.name):'—'}<br>⏰ Hay đi trễ nhất: ${top(v=>v.late+' lần',v=>v.late)}<br>🌙 Tăng ca nhiều nhất: ${top(v=>hm(v.ot),v=>v.ot)}<br>📝 Hay quên check in: ${top(v=>v.miss+' ngày',v=>v.miss)}<br>🚪 Đã nghỉ việc: ${left}</p>
+<div class="tw"><table style="min-width:600px"><tr><th>Tên</th><th>Đi làm</th><th>Phép</th><th>Nửa ngày</th><th>Trễ</th><th>Tăng ca</th><th>Quên CI</th></tr>${st.map(v=>`<tr><td>${esc(v.s.name)}${v.s.left?' <span class="mu">(nghỉ)</span>':''}</td><td>${v.x}</td><td>${v.p}</td><td>${v.px}</td><td>${v.late}</td><td>${hm(v.ot)||'0'}${v.otAp?' (duyệt '+hm(v.otAp)+')':''}</td><td>${v.miss}</td></tr>`).join('')}</table></div></div>
+<div class="card"><h3 style="margin-top:0;color:var(--gold);font-weight:600">Xóa dữ liệu chấm công</h3><div class="row"><div><label>Xóa theo</label><select id="dt_t" onchange="$('dt_m').classList.toggle('hide',this.value!='m');$('dt_y').classList.toggle('hide',this.value!='y')"><option value="m">Tháng</option><option value="y">Năm</option></select></div><div><label>Thời gian</label><input type="month" id="dt_m" value="${today().slice(0,7)}"><input type="number" id="dt_y" class="hide" value="${today().slice(0,4)}" min="2000" max="2100"></div><button class="sm d" style="flex:none;padding:11px" onclick="delData()">Xóa dữ liệu</button></div></div>`;
+$('rm').value=pr.m;$('rd').value=pr.d}
+async function delData(){const k=$('dt_t').value,v=k=='m'?$('dt_m').value:$('dt_y').value;if(!v)return info('Thiếu thông tin','Vui lòng chọn thời gian.');const lab=k=='m'?'tháng '+v.slice(5)+'/'+v.slice(0,4):'năm '+v,n=db.rec.filter(r=>r.d.startsWith(v)).length;if((await dlg('⚠ Xóa dữ liệu chấm công',`Sẽ xóa hết toàn bộ dữ liệu chấm công của ${lab} (${n} bản ghi). Bạn có đồng ý không?`,[['Không',0],['Đồng ý xóa',1,'p']])).v){db.rec=db.rec.filter(r=>!r.d.startsWith(v));save();renderA1();info('✔','Đã xóa dữ liệu chấm công của '+lab+'.')}}
+function appr(id){db.rec.find(r=>r.id==id).ap=true;save();renderA1()}
+function big(id,n){const r=db.rec.find(x=>x.id==id);info(n==2?'Ảnh check out':'Ảnh check in',`<img class="big" src="${n==2?r.photo2:r.photo}">`)}
+async function delR(id){if((await dlg('Xóa chấm công','Bạn chắc chắn muốn xóa?',[['Hủy',0],['Xóa',1,'p']])).v){db.rec=db.rec.filter(r=>r.id!=id);save();renderA1()}}
+async function editR(id){const r=db.rec.find(x=>x.id==id);const o=(v,l,c)=>`<option value="${v}" ${c==v?'selected':''}>${l}</option>`;
+const x=await dlg('Chỉnh sửa chấm công',`<label>Loại</label><select name="type">${Object.entries(TY).map(([k,v])=>o(k,v,r.type)).join('')}</select><label>Giờ vào</label><input type="time" name="in" value="${r.in}"><label>Giờ ra</label><input type="time" name="out" value="${r.out}"><label>Loại check out</label><select name="ot">${o('home','Về',r.ot)}${o('half','Nghỉ buổi chiều',r.ot)}</select><label>Ghi chú</label><textarea name="reason" rows="2">${esc(r.reason)}</textarea>`,[['Hủy',0],['Lưu',1,'p']]);
+if(x.v){Object.assign(r,x.f);save();renderA1()}}
+function xls(){const[a,b]=range(),st=stats(a,b);let h=`<meta charset="utf-8"><h3>Tổng hợp công ${dmy(a)} - ${dmy(b)}</h3><table border="1"><tr><th>Tên</th><th>Ngày đi làm</th><th>Số ngày đi làm</th><th>Ngày nghỉ phép</th><th>Số ngày phép</th><th>Nửa ngày</th><th>Số lần đi trễ</th><th>Giờ tăng ca</th><th>Giờ tăng ca đã duyệt</th><th>Quên check in</th><th>Ngày nghỉ việc</th></tr>`;
+st.forEach(v=>h+=`<tr><td>${esc(v.s.name)}</td><td>${v.xd.join(', ')}</td><td>${v.x}</td><td>${v.pd.join(', ')}</td><td>${v.p}</td><td>${v.px}</td><td>${v.late}</td><td>${(v.ot/60).toFixed(2)}</td><td>${(v.otAp/60).toFixed(2)}</td><td>${v.miss}</td><td>${v.s.left?dmy(v.s.left):''}</td></tr>`);
+h+='</table><br><h3>Chi tiết</h3><table border="1"><tr><th>Ngày</th><th>Tên</th><th>Vào</th><th>Ra</th><th>Công</th><th>Tăng ca (phút)</th><th>Trễ (phút)</th><th>Về sớm (phút)</th><th>Ghi chú</th></tr>';
+db.rec.filter(r=>r.d>=a&&r.d<=b).sort((x,y)=>x.d.localeCompare(y.d)).forEach(r=>{const c=calc(r);h+=`<tr><td>${dmy(r.d)}</td><td>${esc((sf(r.sid)||{}).name)}</td><td>${r.in}</td><td>${r.out}</td><td>${c.mark}</td><td>${c.ot}</td><td>${c.late}</td><td>${c.early}</td><td>${esc(r.reason)}</td></tr>`});
+const l=document.createElement('a');l.href=URL.createObjectURL(new Blob([h+'</table>'],{type:'application/vnd.ms-excel'}));l.download=`cong_${a}_${b}.xls`;l.click()}
+function renderA2(){const f=s=>`<tr><td>${esc(s.name)}</td><td>${s.type=='main'?'Chính':'Phụ'}</td><td>${s.start}–${s.end}</td>${s.left?`<td>${dmy(s.left)}</td>`:''}<td>${s.left?`<button class="sm" onclick="back(${s.id})">Đi làm lại</button>`:`<button class="sm" onclick="editS(${s.id})">Sửa</button><button class="sm" onclick="quit(${s.id})">Nghỉ việc</button>`}<button class="sm d" onclick="delS(${s.id})">Xóa</button></td></tr>`;
+const A=db.staff.filter(s=>!s.left),L=db.staff.filter(s=>s.left);
+$('a2').innerHTML=`<div class="card"><button class="btn" style="margin:0 0 12px" onclick="editS()">+ Thêm nhân viên</button><div class="tw"><table style="min-width:480px"><tr><th>Tên</th><th>Loại</th><th>Giờ làm</th><th></th></tr>${A.map(f).join('')||'<tr><td class="mu">Chưa có nhân viên</td></tr>'}</table></div></div>
+${L.length?`<div class="card"><h3 style="margin-top:0;color:var(--gold);font-weight:400">Đã nghỉ việc</h3><div class="tw"><table style="min-width:480px"><tr><th>Tên</th><th>Loại</th><th>Giờ làm</th><th>Ngày nghỉ</th><th></th></tr>${L.map(f).join('')}</table></div></div>`:''}`}
+async function editS(id){const s=id?sf(id):{name:'',start:'08:00',end:'17:00',type:'main'};
+const x=await dlg(id?'Sửa nhân viên':'Thêm nhân viên',`<label>Họ tên</label><input name="name" value="${esc(s.name)}"><label>Giờ bắt đầu</label><input type="time" name="start" value="${s.start}"><label>Giờ kết thúc</label><input type="time" name="end" value="${s.end}"><label>Loại</label><select name="type"><option value="main" ${s.type=='main'?'selected':''}>Chính</option><option value="part" ${s.type=='part'?'selected':''}>Phụ</option></select>`,[['Hủy',0],['Lưu',1,'p']]);
+if(!x.v)return;if(!x.f.name.trim())return info('Thiếu tên','Vui lòng nhập họ tên.');if(id)Object.assign(s,x.f);else db.staff.push({id:Date.now(),...x.f,left:''});save();renderA2()}
+async function quit(id){const x=await dlg('Nghỉ việc',`<label>Ngày nghỉ việc</label><input type="date" name="d" value="${today()}"><p class="mu">Sau ngày này nhân viên sẽ không còn trong check in/out, chỉ còn trong bảng tổng hợp tháng đó.</p>`,[['Hủy',0],['Xác nhận',1,'p']]);if(x.v&&x.f.d){sf(id).left=x.f.d;save();renderA2()}}
+function back(id){sf(id).left='';save();renderA2()}
+async function delS(id){if((await dlg('Xóa nhân viên','Xóa nhân viên (và toàn bộ chấm công của người này)? Nếu chỉ nghỉ việc, hãy dùng nút "Nghỉ việc".',[['Hủy',0],['Xóa',1,'p']])).v){db.staff=db.staff.filter(s=>s.id!=id);db.rec=db.rec.filter(r=>r.sid!=id);save();renderA2()}}
+function renderA3(){const s=db.s,i=(k,l,t)=>`<label>${l}</label><${t||'input'} id="s_${k}" ${t?'rows="2">'+esc(s[k])+'</textarea':`value="${esc(s[k])}">`}`;
+$('a3').innerHTML=`<div class="card">${i('id','ID admin')}${i('pw','Mật khẩu admin')}${i('title','Tiêu đề')}${i('sub','Phụ đề')}${i('mLate','Thông báo đi trễ','textarea')}${i('mThanks','Thông báo khi check out muộn','textarea')}${i('mOk','Thông báo thành công','textarea')}<label>Logo</label><input type="file" id="s_logo" accept="image/*"><button class="btn" onclick="saveS()">Lưu thay đổi</button></div>`}
+function saveS(){const g=k=>$('s_'+k).value;if(!g('id').trim()||!g('pw').trim())return info('Thiếu thông tin','ID và mật khẩu không được trống.');
+['id','pw','title','sub','mLate','mThanks','mOk'].forEach(k=>db.s[k]=g(k));const f=$('s_logo').files[0],done=()=>{save();skin();info('✔','Đã lưu thay đổi.')};f?img(f,300,d=>{db.s.logo=d;done()}):done()}
+function renderAll(){renderA1();renderA2();renderA3()}
+function login(){if($('aid').value==db.s.id&&$('apw').value==db.s.pw){sessionStorage.adm=1;showAdm()}else info('Sai thông tin','ID hoặc mật khẩu không đúng.')}
+function logout(){delete sessionStorage.adm;showAdm()}
+function showAdm(){const on=!!sessionStorage.adm;$('lgn').classList.toggle('hide',on);$('adm').classList.toggle('hide',!on);$('apw').value='';if(on)renderAll()}
+skin();fillSel();showAdm();
+</script></body></html>
