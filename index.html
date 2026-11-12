@@ -51,12 +51,12 @@ td img{width:38px;height:38px;object-fit:cover;border-radius:6px;cursor:pointer}
   <div id="ci">
    <label>Tên nhân viên</label><div class="ac"><input id="ciN" autocomplete="off" placeholder="Nhập tên, mã NV hoặc đơn vị..." oninput="acIn('ci')" onfocus="acIn('ci')" onblur="acHide('ci')" onkeydown="acKey(event,'ci')"><input type="hidden" id="ciId"><div class="acl hide" id="ciL"></div></div><div class="inf" id="ciI"></div>
    <label>Loại chấm công</label><select id="ciT" onchange="shPh()"><option value="normal">Đi làm bình thường</option><option value="full">Nghỉ phép cả ngày</option><option value="am">Nghỉ phép sáng</option><option value="pm">Nghỉ phép chiều</option><option value="weekly">Nghỉ hàng tuần</option><option value="forgot">Quên check in</option></select>
-   <div id="ciPh"><label>Ảnh check in</label><button type="button" class="sm" style="padding:11px;width:100%" onclick="takeIn()">📷 Chụp ảnh</button><img class="pv" id="ciP"></div>
+   <div id="ciPh"><label>Ảnh check in</label><button type="button" class="sm" style="padding:11px;width:100%" onclick="pickPhoto('in')">📷 Chụp ảnh</button><input type="file" id="ciF" accept="image/*" capture="user" class="hide" onchange="gotPhoto(this,'in')"><img class="pv" id="ciP"></div>
    <button class="btn" onclick="checkin()">Check in</button></div>
   <div id="co" class="hide">
    <label>Tên nhân viên</label><div class="ac"><input id="coN" autocomplete="off" placeholder="Nhập tên, mã NV hoặc đơn vị..." oninput="acIn('co')" onfocus="acIn('co')" onblur="acHide('co')" onkeydown="acKey(event,'co')"><input type="hidden" id="coId"><div class="acl hide" id="coL"></div></div><div class="inf" id="coI"></div>
    <label>Loại</label><select id="coT"><option value="home">Về</option><option value="half">Nghỉ buổi chiều</option></select>
-   <label>Ảnh check out</label><button type="button" class="sm" style="padding:11px;width:100%" onclick="takeOut()">📷 Chụp ảnh</button><img class="pv" id="coP">
+   <label>Ảnh check out</label><button type="button" class="sm" style="padding:11px;width:100%" onclick="pickPhoto('out')">📷 Chụp ảnh</button><input type="file" id="coF" accept="image/*" capture="user" class="hide" onchange="gotPhoto(this,'out')"><img class="pv" id="coP">
    <button class="btn" onclick="checkout()">Check out</button></div>
  </div>
 </section>
@@ -109,12 +109,8 @@ document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{document.quer
 document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.seg button').forEach(x=>x.classList.toggle('on',x==b));$('ci').classList.toggle('hide',b.dataset.c!='ci');$('co').classList.toggle('hide',b.dataset.c!='co');fillSel()});
 document.querySelectorAll('.sub button[data-a]').forEach(b=>b.onclick=()=>{document.querySelectorAll('.sub button[data-a]').forEach(x=>x.classList.toggle('on',x==b));['a1','a2','a3'].forEach(i=>$(i).classList.toggle('hide',i!=b.dataset.a));renderAll()});
 let photo='',photo2='';
-function snap(){return new Promise(res=>{const m=$('m');m.innerHTML='<div class="box"><h3>📷 Chụp ảnh</h3><video id="cv" autoplay playsinline muted style="width:100%;border-radius:10px;background:#000"></video><div class="bt"><button id="cx">Hủy</button><button class="p" id="cs">Chụp</button></div></div>';m.classList.add('on');let st;
-const end=v=>{if(st)st.getTracks().forEach(x=>x.stop());m.classList.remove('on');res(v)},bad=()=>{end('');info('Không mở được camera','Hãy cho phép truy cập camera và mở trang bằng HTTPS.')};
-if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)return bad();
-navigator.mediaDevices.getUserMedia({video:{facingMode:'user'}}).then(s=>{st=s;$('cv').srcObject=s}).catch(bad);
-$('cx').onclick=()=>end('');$('cs').onclick=()=>{const v=$('cv');if(!v.videoWidth)return;const k=Math.min(1,160/Math.max(v.videoWidth,v.videoHeight)),c=document.createElement('canvas');c.width=v.videoWidth*k;c.height=v.videoHeight*k;c.getContext('2d').drawImage(v,0,0,c.width,c.height);end(c.toDataURL('image/jpeg',.5))}})}
-const takeIn=async()=>{const d=await snap();if(d){photo=d;$('ciP').src=d;$('ciP').style.display='block'}},takeOut=async()=>{const d=await snap();if(d){photo2=d;$('coP').src=d;$('coP').style.display='block'}};
+function pickPhoto(k,face){const f=$(k=='in'?'ciF':'coF');f.click()}
+function gotPhoto(inp,k){const f=inp.files[0];inp.value='';if(!f)return;img(f,160,d=>{if(k=='in'){photo=d;$('ciP').src=d;$('ciP').style.display='block'}else{photo2=d;$('coP').src=d;$('coP').style.display='block'}})}
 const has=(d,id)=>db.rec.filter(r=>r.d==d&&r.sid==id),isL=r=>['full','weekly','adm','forgot'].includes(r.type);
 const needLs=r=>['full','am','pm','forgot'].includes(r.type)||(r.type=='normal'&&r.ot=='half');
 const isHalf=r=>r.type=='am'||r.type=='pm'||(r.type=='normal'&&r.ot=='half');
@@ -156,7 +152,7 @@ r.out=t;r.ot=$('coT').value;if(r.ot=='half'&&r.type=='normal')r.ls='';r.photo2=r
 const half=r.ot=='half'&&r.type=='normal';
 info(t>s.end?'🌿 Cảm ơn bạn':'✔ '+esc(s.name),(half?'Đã gửi, chờ admin duyệt nghỉ buổi chiều.':t>s.end?esc(db.s.mThanks):esc(db.s.mOk))+'<p class="inf">'+myInfo(id)+'</p>')}
 /* ===== Tính công ===== */
-const LB={X:'X',P:'P',PX:'PX',NT:'NT',DL:'Đang làm',LT:'<7h',K:'K',X2:'X/2',CD:'Chờ duyệt'};
+const LB={X:'X',P:'P',PX:'PX',NT:'NHT',DL:'Đang làm',LT:'<7h',K:'K',X2:'X/2',CD:'Chờ duyệt'};
 const durM=r=>{if(!r.out||!r.in)return 0;const a=mi(r.in),b=mi(r.out);return b>=a?b-a:b+1440-a},rnd=m=>m<30?0:Math.floor(m/60)*60+(m%60>=30?30:0);
 function dayInfo(sid,d){const L=db.rec.filter(r=>r.sid==sid&&r.d==d),min=L.filter(r=>r.type=='normal').reduce((a,r)=>a+durM(r),0),ov=L.find(r=>r.ov);
 if(ov)return{mark:ov.ov,min,ap:ov.id};
@@ -216,7 +212,7 @@ const uo=unitsAll(),noU=db.staff.some(s=>!unitOf(s)),op=(v,l)=>`<option value="$
 $('a1').innerHTML=`<div class="card"><div class="row"><div><label>Xem theo</label><select onchange="setV('m',this.value)"><option value="day" ${m=='day'?'selected':''}>Ngày</option><option value="week" ${m=='week'?'selected':''}>Tuần</option><option value="month" ${m=='month'?'selected':''}>Tháng</option></select></div><div><label>Ngày</label>${dI('rd',V.d,'','setD(this)')}</div><div><label>Đơn vị</label><select onchange="setV('u',this.value)">${op('','Tất cả đơn vị')}${uo.map(u=>op(u,u)).join('')}${noU?op('__none',UN):''}</select></div><button class="sm" style="flex:none;padding:11px" onclick="xls()">⬇ Xuất Excel</button></div>
 <p class="mu">${dmy(a)}${a!=b?' → '+dmy(b):''}</p></div>
 <div class="card tw"><table style="min-width:1150px"><tr>${m!='day'?'<th>Ngày</th>':''}<th>Tên</th><th>Mã NV</th><th>Vào</th><th>Ra</th><th>Công</th><th>Tăng ca</th><th>Đi trễ</th><th>Về sớm</th><th>Ảnh vào/ra</th><th>Ghi chú</th><th></th></tr>${tr}</table>
-<p class="mu">X: đi làm đủ (tổng các lần check in từ 7 giờ) · P: phép đã duyệt · PX: nửa ngày phép đã duyệt · X/2: nửa ngày (phần nghỉ chưa duyệt/không duyệt, không lương) · K: không lương · Chờ duyệt: chưa được ghi nhận · NT: nghỉ hàng tuần · ✔: Admin đã duyệt · Tăng ca: mỗi bên từ 30 phút, làm tròn theo mốc 30 phút (dưới 30 phút = 0), chỉ tính khi admin duyệt.</p></div>
+<p class="mu">X: làm việc cả ngày · P: nghỉ phép cả ngày · K: không lương · NHT: nghỉ hàng tuần · PX: nửa ngày làm việc, nửa ngày nghỉ phép · X/2: nửa ngày làm việc, nửa ngày không lương · Chờ duyệt: chưa được ghi nhận · ✔: Admin đã duyệt · Tăng ca: mỗi bên từ 30 phút, làm tròn theo mốc 30 phút (dưới 30 phút = 0), chỉ tính khi admin duyệt.</p></div>
 <div class="card"><h3 style="margin-top:0;color:var(--gold);font-weight:600">Đánh giá tháng ${mm.slice(5)}/${mm.slice(0,4)}</h3><p>⏰ Đi trễ nhiều nhất: ${top(v=>v.late+' ngày',v=>v.late)}<br>🌙 Tăng ca nhiều nhất: ${top(v=>hm(v.ot),v=>v.ot)}</p>
 <div class="tw"><table style="min-width:760px"><tr><th>Tên</th><th>Mã NV</th><th>Đi làm (ngày)</th><th>Nghỉ phép (ngày)</th><th>Không lương (ngày)</th><th>Nghỉ tuần</th><th>Đi trễ (ngày)</th><th>Tăng ca</th><th>Nhận xét</th></tr>${ev}</table></div><p class="mu">Chăm chỉ: đi trễ không quá 2 ngày và không quên check in.</p></div>
 <div class="card"><h3 style="margin-top:0;color:var(--gold);font-weight:600">Xóa dữ liệu chấm công</h3><div class="row"><div><label>Xóa theo</label><select id="dt_t" onchange="$('dt_m').classList.toggle('hide',this.value!='m');$('dt_y').classList.toggle('hide',this.value!='y')"><option value="m">Tháng</option><option value="y">Năm</option></select></div><div><label>Thời gian</label><input type="text" id="dt_m" placeholder="mm/yyyy" maxlength="7" value="${today().slice(5,7)}/${today().slice(0,4)}"><input type="number" id="dt_y" class="hide" value="${today().slice(0,4)}" min="2000" max="2100"></div><button class="sm d" style="flex:none;padding:11px" onclick="delData()">Xóa dữ liệu</button></div></div>`}
@@ -323,5 +319,5 @@ skin();fillSel();showAdm();
 onSnapshot(doc(fs,'settings','main'),d=>{if(d.exists()){db.s={...DEF_S,...d.data()};if((db.s.mThanks||'').startsWith('Hôm nay bạn vất vả'))db.s.mThanks=DEF_S.mThanks;skin();if(sessionStorage.adm&&!$('a3').contains(document.activeElement))renderA3()}else putSet().catch(fail)},fail);
 onSnapshot(collection(fs,'staff'),q=>{db.staff=q.docs.map(x=>x.data()).sort((a,b)=>a.id-b.id);refresh()},fail);
 onSnapshot(collection(fs,'records'),q=>{db.rec=q.docs.map(x=>x.data());refresh()},fail);
-Object.assign(window,{takeIn,takeOut,saveAcc,apv,unapv,apvM,showI,shPh,$,checkin,checkout,login,logout,xls,appr,rejOt,unOt,setLs,setV,setD,big,editR,delR,editS,quit,back,delS,saveS,delData,renderA1,acIn,acPick,acKey,acHide,dfmt,pickD,natD,tpl,upStaff});
+Object.assign(window,{pickPhoto,gotPhoto,saveAcc,apv,unapv,apvM,showI,shPh,$,checkin,checkout,login,logout,xls,appr,rejOt,unOt,setLs,setV,setD,big,editR,delR,editS,quit,back,delS,saveS,delData,renderA1,acIn,acPick,acKey,acHide,dfmt,pickD,natD,tpl,upStaff});
 </script></body></html>
